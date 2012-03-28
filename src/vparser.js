@@ -40,6 +40,7 @@ function VParser(str){
 	
 	this.buffer = '';
 	this.buffers = [];
+	this.escape = true;
 
 	this.debug = false;
 	this.consumedTokens = [];
@@ -103,7 +104,7 @@ VParser.prototype = {
 			,len
 			,previous = null
 			,current = null
-			,generated = 'var out = "";\n'
+			,generated = 'var out = "", __vtemp = "";\n'
 			,modes = VParser.modes
 			,reQuote = /[\"']/gi
 			,reLineBreak = /[\n\r]/gi
@@ -116,14 +117,15 @@ VParser.prototype = {
 
 			if(current.type === modes.MKP){
 				generated += 
-					(previous !== null && (previous.type === modes.MKP || previous.type === modes.EXP) 
-						? '+' 
-						: 'out += ') 
+					//(previous !== null && (previous.type === modes.MKP || previous.type === modes.EXP) 
+					//	? '+' 
+					//	: 'out += ') 
+					'out += '
 					+ '\'' 
 					+ current.value
 						.replace(reQuote, '\"')
 						.replace(reLineBreak, '\\n') 
-					+ '\'\n';
+					+ '\';\n';
 			}
 
 			if(current.type === modes.BLK){
@@ -135,13 +137,26 @@ VParser.prototype = {
 
 			if(current.type === modes.EXP){
 				generated += 
-					(previous !== null && (previous.type === modes.MKP || previous.type === modes.EXP) 
-						? '+' 
-						: 'out +=') 
+					'__vtemp = (typeof (__vtemp = ' + current.value + ') === "undefined" ? "" : __vtemp);'
+
+					//(previous !== null && (previous.type === modes.MKP || previous.type === modes.EXP) 
+					//	? '+' 
+					//	: 'out +=') 
 					//+ ' (' 
-					+ current.value
-						.replace(reQuote, '\"')
-						.replace(reLineBreak, '\\n') 
+
+					+ (current.escape === true 
+						? '__vtemp = __vtemp.toString()'
+							+ '.replace(/&(?!\w+;)/g, "&#38;")'
+							+ '.replace(/</g, "&lt;")'
+							+ '.replace(/>/g, "&gt;")'
+							+ '.replace(/"/g, "&quot;")'
+							//.replace(/'/g, '&#39;')
+							//.replace(/\//g, '&#47;')
+						: current.value)
+
+					.replace(reQuote, '\"')
+					.replace(reLineBreak, '\\n')
+					+ ';out += __vtemp;'
 					+ '\n';//+ ')\n';
 			}
 		}
@@ -264,8 +279,9 @@ VParser.prototype = {
 
 	,_endMode: function(nextMode){
 		if(this.buffer !== ''){
-			this.buffers.push( { type: this.mode, value: this.buffer } );
+			this.buffers.push( { type: this.mode, value: this.buffer, escape: this.escape } );
 			this.buffer = '';
+			this.escape = true;
 		}
 		this.mode = nextMode || VParser.modes.MKP;
 	}
@@ -283,12 +299,18 @@ VParser.prototype = {
 				this._advanceUntilMatched(curr, this.tks.AT_STAR_OPEN, this.tks.AT_STAR_CLOSE);
 				break;
 			
+			case this.tks.AT_BANG:
+				this._endMode(VParser.modes.EXP);
+				this.escape = false;
+				break;
+
 			case this.tks.AT:
 				if(next) switch(next.type){
 					
 					case this.tks.PAREN_OPEN:
 					case this.tks.IDENTIFIER:
 						this._endMode(VParser.modes.EXP);
+						this.escape = true;
 						break;
 					
 					case this.tks.KEYWORD:

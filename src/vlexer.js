@@ -82,6 +82,7 @@ VLexer.prototype = {
 			|| this.AT_STAR_OPEN()
 			|| this.AT_STAR_CLOSE()
 
+			|| this.AT_BANG()
 			|| this.AT_COLON()
 			|| this.AT()
 			
@@ -138,6 +139,9 @@ VLexer.prototype = {
 	}
 	,AT_COLON: function(){
 		return this.scan(/^@\:/, VLexer.tks.AT_COLON);
+	}
+	,AT_BANG: function(){
+		return this.scan(/^@\!/, VLexer.tks.AT_BANG);
 	}
 	,AT_STAR_OPEN: function(){
 		return this.scan(/^(@\*)/, VLexer.tks.AT_STAR_OPEN);
@@ -214,6 +218,7 @@ VLexer.tks = {
 	,AT_STAR_OPEN: 'AT_STAR_OPEN'
 	,AT_STAR_CLOSE: 'AT_STAR_CLOSE'
 	,AT_COLON: 'AT_COLON'
+	,AT_BANG: 'AT_BANG'
 	,EMAIL: 'EMAIL'
 	,PAREN_OPEN: 'PAREN_OPEN'
 	,PAREN_CLOSE: 'PAREN_CLOSE'

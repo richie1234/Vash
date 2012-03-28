@@ -96,7 +96,7 @@ suite = new Benchmark.Suite("vash parse times by template size")
 	new vash.VParser(smallVTemplate).parse()
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 //suite = new Benchmark.Suite("vash generate times by template size")
 //.add("vash#generate tokens large", function(){
@@ -119,7 +119,7 @@ suite = new Benchmark.Suite("vash vs doT compilation large")
 	vash.compile(largeVTemplate)
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 suite = new Benchmark.Suite("vash vs doT compilation medium")
 .add("dot#template medium", function(){
@@ -132,7 +132,7 @@ suite = new Benchmark.Suite("vash vs doT compilation medium")
 	vash.compile(mediumVTemplateNoWith, false)
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 suite = new Benchmark.Suite("vash vs doT compilation small")
 .add("dot#template small", function(){
@@ -142,7 +142,7 @@ suite = new Benchmark.Suite("vash vs doT compilation small")
 	vash.compile(smallVTemplate)
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 suite = new Benchmark.Suite("vash vs doT render large")
 .add("dot#template large", function(){
@@ -152,7 +152,7 @@ suite = new Benchmark.Suite("vash vs doT render large")
 	largeVTpl( largeData );
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 suite = new Benchmark.Suite("vash vs doT render medium")
 .add("dot#template medium", function(){
@@ -175,7 +175,7 @@ suite = new Benchmark.Suite("vash vs doT render small")
 	smallVTpl( smallData )
 })
 logSuiteName(suite);
-suite.run();
+//suite.run();
 
 
 //.on('cycle', function(event, bench){
